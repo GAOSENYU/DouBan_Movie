@@ -1,0 +1,105 @@
+@charset "utf-8";
+/* CSS Document */
+.box{
+
+	/*margin-top: 20px;*/
+	margin-bottom: 60px;
+	width: 100%;
+	height: 340px;
+	position: relative;
+}
+.list{
+	/*border:1px solid #FF0000;*/
+	width: 1200px;
+	height: 400px;
+	overflow: hidden;
+	position: absolute;
+	left: 52%;
+	margin-left: -600px;
+}
+
+li{
+	position: absolute;
+	top: 0;
+	left: 0;
+	list-style: none;
+	opacity: 0;
+	transition: all 0.3s ease-out;
+}
+img{
+	width: 270px;
+	height: 385px;
+	border:none;
+	float: left;
+}
+.p1{
+	transform:translate3d(-224px,0,0) scale(0.81);
+}
+.p2{
+	transform:translate3d(0px,0,0) scale(0.81);
+	transform-origin:0 50%;
+	opacity: 0.8;
+	z-index: 3;
+}
+.p3{
+	transform:translate3d(224px,0,0) scale(1);
+	opacity: 1;
+	z-index: 4;
+}
+.p4{
+	transform:translate3d(449px,0,0) scale(0.81);
+	transform-origin:100% 50%;
+	opacity: 0.8;
+	z-index: 3;
+}
+.p5{
+	transform:translate3d(672px,0,0) scale(0.81);
+	transform-origin:100% 50%;
+	opacity: 0.8;
+	z-index: 3;
+
+}
+.p6{
+	transform:translate3d(896px,0,0) scale(0.81);
+	transform-origin:100% 50%;
+	opacity: 0.8;
+	z-index: 3;
+	
+}
+.p7{
+	transform:translate3d(1120px,0,0) scale(0.81);
+}
+.img_1{
+	transform:scale(0.7);
+}
+
+
+.buttons{
+
+	position: absolute;
+	width: 1200px;
+	height: 50px;
+	bottom: 0;
+	left: 50%;
+	margin-left: -600px;
+	text-align: center;
+	padding-top: 80px;
+}
+.buttons a{
+	display: inline-block;
+	width: 35px;
+	height: 5px;
+	padding-top: 70px;
+	cursor: pointer;
+}
+span{
+	display: block;
+	width: 35px;
+	height: 2px;
+	background: gray;
+}
+.blue{
+	background: black;
+}
+
+

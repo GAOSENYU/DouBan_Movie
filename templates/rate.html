@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>电影评分</title>
+
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/blog.css" rel="stylesheet">
+  <script type="text/javascript" src="echarts/echarts.js"></script>
+  <script src="http://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+  <script type="text/javascript" src="{{ url_for('static', filename='echarts/echarts.js') }}"></script>
+ 
+
+</head>
+<style>
+#rate {
+    padding: 30px 50px;
+    text-align: center;
+}
+
+#rate #basic {
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+    height: 300px;
+}
+
+#rate #dynamic {
+    padding: 20px;
+    text-align: center;
+}
+
+#rate #dynamic #control {
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+#rate #dynamic #plots {
+    width: 100%;
+}
+
+#rate #categories {
+    margin-bottom: 10px;
+}
+
+#rate #districts span,
+#rate #categories span {
+    display: inline-block;
+    font-size: 12px;
+    color: #fff;
+    background-color: #ccc;
+    padding: 3px 6px;
+    margin-bottom: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: color .3s;
+    -o-transition: color .3s;
+    -ms-transition: color .3s;
+    -moz-transition: color .3s;
+    -webkit-transition: color .3s;
+    transition: background-color .3s;
+    -o-transition: background-color .3s;
+    -ms-transition: background-color .3s;
+    -moz-transition: background-color .3s;
+    -webkit-transition: background-color .3s;
+}
+
+#rate #districts span.active,
+#rate #categories span.active {
+    color: #fff;
+    background-color: #333;
+}
+
+#rate #showtime {
+    width: 44%;
+    height: 300px;
+    display: inline-block;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+#rate #length {
+    width: 44%;
+    height: 300px;
+    display: inline-block;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+#rate #average {
+    width: 94%;
+    margin-left: 3%;
+    margin-right: 3%;
+    height: 300px;
+}
+</style>
+<body style="background:#F0F0F0">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="collapse navbar-collapse" id="navbarNavDropdown" >
+        <a class="navbar-nav nav-item active nav-link text-white" href="{{url_for('index')}}" >首页 </span></a>
+        <a class="navbar-nav nav-item active nav-link text-white" href="{{url_for('pattern')}}">电影格局 </span></a>
+        <a class="navbar-nav nav-item active nav-link text-blue" href="{{url_for('rate')}}">评分关系 </span></a>
+        <a class="navbar-nav nav-item active nav-link text-white" href="{{url_for('atlas')}}">电影图谱 </span></a>
+        <a class="navbar-nav nav-item active nav-link text-white" href="{{url_for('search')}}">电影中心 </span></a>
+        <a class="navbar-nav nav-item active nav-link text-white" href="#">推荐中心 </span></a>
+      </div>
+      <div class="col-4  text-center">
+        <a class="blog-header-logo text-white" href="#">Film Information Network</a>
+      </div>
+   
+    </nav>
+
+
+  <!--   <div class="container">
+      <!-- <div class="row" style="margin-top:60px">
+        <div class="col-12" id="showtime" style="width:600px;height:400px;"></div>
+      </div> -->
+   
+    <div id="rate">
+      <div id="basic"></div>
+      <div style="position:relative;">
+          <select style="position:absolute;right:110px;top:0px;z-index:999;height:30px;vertical-align:middle;background-color:#f3f3f3;color:#2D8EA0;border-color:rgba(97,164,177,0.6);">
+              {% for item in districts %}
+              <option value="{{item}}">{{item}}</option>
+              {% endfor %}
+          </select>
+          <div id="average"></div>
+      </div>
+      <div id="dynamic">
+          <div id="control">
+              <div id="categories">
+                  <span class="active" name="all" onclick="attention()">全部</span> {% for item in categories %}
+                  <span>{{item}}</span> {% endfor %}
+              </div>
+            
+          </div>
+          <div id="plots">
+              <div id="showtime" style="width:1200px;height:400px;"></div>
+              <div id="length" style="width:1200px;height:400px;"></div>
+          </div>
+      </div>
+    </div>
+
+    <footer class="blog-footer">
+         
+    </footer>
+	
+<script type="text/javascript">
+
+  var movies = eval('({{movies|safe}})')['movies'];
+  var rates = eval('({{rates|safe}})')['rates'];
+  var showtimeData = [];
+  var lengthData = [];  
+  // console.log(rates);
+  // var category = [];
+  for (var i = 0; i < movies.length; i++) {
+    showtimeData.push([movies[i]["showtime"], movies[i]["rate"]]);
+    lengthData.push([movies[i]["length"], movies[i]["rate"]]);
+  }
+
+  console.log(showtimeData)
+// 全球电影评分统计
+  var basic = echarts.init(document.getElementById('basic'));
+  option = {
+    title : {
+          text: '全球电影评分统计',
+          // subtext: '豆瓣电影',
+          x:'center'
+      },
+      tooltip : {
+          trigger: 'item',
+          formatter: "{b}评分: {c}部电影"
+      },
+      xAxis: {
+          type: 'value',
+                    min: 2,
+                    max: 10,
+      },
+      yAxis: {
+          type: 'value'
+
+      },
+      series: [{
+          data: [
+                        [2.5, 1],
+                        [3.6, 1],
+                        [3.8, 2],
+                        [3.9, 2],
+                        [4.0, 7],
+                        [4.1, 8],
+                        [4.2, 8],
+                        [4.3, 7],
+                        [4.4, 11],
+                        [4.5, 11],
+                        [4.6, 17],
+                        [4.7, 13],
+                        [4.8, 11],
+                        [4.9, 15],
+                        [5.0, 21],
+                        [5.1, 32],
+                        [5.2, 38],
+                        [5.3, 29],
+                        [5.4, 47],
+                        [5.5, 55],
+                        [5.6, 52],
+                        [5.7, 87],
+                        [5.8, 71],
+                        [5.9, 73],
+                        [6.0, 82],
+                        [6.1, 81],
+                        [6.2, 91],
+                        [6.3, 97],
+                        [6.4, 131],
+                        [6.5, 119],
+                        [6.6, 149],
+                        [6.7, 144],
+                        [6.8, 142],
+                        [6.9, 116],
+                        [7.0, 133],
+                        [7.1, 147],
+                        [7.2, 160],
+                        [7.3, 151],
+                        [7.4, 163],
+                        [7.5, 156],
+                        [7.6, 154],
+                        [7.7, 146],
+                        [7.8, 122],
+                        [7.9, 120],
+                        [8.0, 170],
+                        [8.1, 183],
+                        [8.2, 177],
+                        [8.3, 155],
+                        [8.4, 140],
+                        [8.5, 131],
+                        [8.6, 106],
+                        [8.7, 104],
+                        [8.8, 69],
+                        [8.9, 45],
+                        [9.0, 29],
+                        [9.1, 31],
+                        [9.2, 12],
+                        [9.3, 4],
+                        [9.4, 5],
+                        [9.5, 2],
+                        [9.6, 1]
+                    ],
+          type: 'line',
+          // areaStyle: {}
+      }]
+  };
+    basic.setOption(option);
+
+
+// 上映时间—评分关系
+  var showtime = echarts.init(document.getElementById('showtime'));
+  showtimeOption = {
+    title: {
+            text: '上映时间－评分关系',
+            x: "center"
+        },
+    tooltip: {
+            // trigger: 'axis',
+            // formatter: function(params) {
+            //     return params.seriesName + '<br/>' + params.value[0] + '年 ' + params.value[1] + '分';
+            // },
+            axisPointer: {
+                show: true,
+                type: 'cross',
+            }
+        },
+    xAxis: [{
+            type: 'value',
+            min: 1920,
+            max: 2020
+        }],
+    yAxis: [{
+        type: 'value',
+        min: 0,
+        max: 10
+    }],
+    series: [{
+            name: '上映时间－评分',
+            type: 'scatter',
+            data: showtimeData
+        }]
+      };
+  showtime.setOption(showtimeOption);
+// 片长-评分关系
+  var length = echarts.init(document.getElementById('length'));
+  lengthOption = {
+    title: {
+            text: '片长－评分关系',
+            x: "center"
+        },
+    tooltip: {
+            // trigger: 'axis',
+            // formatter: function(params) {
+            //     return params.seriesName + '<br/>' + params.value[0] + '年 ' + params.value[1] + '分';
+            // },
+            axisPointer: {
+                show: true,
+                type: 'cross',
+            }
+        },
+    xAxis: [{
+            type: 'value',
+            min: 20,
+            max: 400
+        }],
+    yAxis: [{
+        type: 'value',
+        min: 0,
+        max: 10
+    }],
+    series: [{
+            name: '上映时间－评分',
+            type: 'scatter',
+            data: lengthData,
+        }]
+      };
+  length.setOption(lengthOption);
+
+  $('#rate #categories span').click(function() {
+        $('#rate #categories span').removeClass('active');
+        $(this).addClass('active');
+    
+        // 筛选符合要求的评分数据
+        var category = $(this).text();
+        if (category == '全部') {
+            showtimeOption.series[0].data = showtimeData;
+            lengthOption.series[0].data = lengthData;
+          
+            var showtime = echarts.init(document.getElementById('showtime'));
+            showtime.setOption(showtimeOption);
+            
+            var length = echarts.init(document.getElementById('length'));
+            length.setOption(lengthOption);
+                
+        } else {
+            var temp1 = [];
+            var temp2 = [];
+            for (var i = 0; i < movies.length; i++) {
+                if (movies[i]['category'].indexOf(category) >= 0) {
+                    temp1.push([movies[i]["showtime"], movies[i]["rate"]]);
+                    temp2.push([movies[i]["length"], movies[i]["rate"]]);
+                }
+            }
+
+            showtimeOption.series[0].data = temp1;
+            lengthOption.series[0].data = temp2; 
+            var showtime = echarts.init(document.getElementById('showtime'));
+            showtime.setOption(showtimeOption);
+            var length = echarts.init(document.getElementById('length'));
+            length.setOption(lengthOption);
+    
+        }
+    });
+
+
+  
+
+  var average = echarts.init(document.getElementById('average'));
+  averageOption = {
+    title : {
+        text: '各国家各类别平均评分',
+        x: 'left',
+        padding: [10, 10, 10, 56]
+    },
+    tooltip : {
+        trigger: 'item'
+    },
+
+    calculable : true,
+    xAxis : [
+        {
+            type: 'category',
+            data: rates['United States of America']['categories'],
+            axisLabel: {  
+               interval:0,  
+               rotate:40  
+            } 
+        }
+    ],
+    yAxis : [
+        {
+            type: 'value',
+            min: 0,
+            max: 10
+        }
+    ],
+    series : [
+        {
+            name:'各个国家类别平均分',
+            type:'bar',
+            data: rates['United States of America']['rates'],
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+    ]
+};
+
+  average.setOption(averageOption);
+  $('#rate select').change(function() {
+
+        var district = $(this).find('option:selected').text();
+      
+        averageOption.xAxis[0].data = rates[district]['categories'];
+        averageOption.series[0].data = rates[district]['rates'];
+        
+        var average = echarts.init(document.getElementById('average'));
+        average.setOption(averageOption);
+
+
+});
+
+  
+
+
+  
+
+   
+
+</script>
+
+
+</body>
+
+</html>
